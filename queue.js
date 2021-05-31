@@ -1,56 +1,94 @@
-const prompt = require("prompt-sync")({ sigint: true });
+class Node {
+  constructor(groupSize, next = null) {
+    this.groupSize = groupSize;
+    this.next = next;
+  }
+}
 
-const students = [
-  { name: "Jean-Luc Garza", score: 24 },
-  { name: "Teddy Munoz", score: 79 },
-  { name: "Georgia Ali", score: 17 },
-  { name: "Vicky Calhoun", score: 8 },
-  { name: "Awais Weaver", score: 65 },
-  { name: "Athena Kline", score: 52 },
-  { name: "Zacharia Whitaker", score: 38 },
-  { name: "Clarice Davenport", score: 99 },
-  { name: "Viktoria Flynn", score: 84 },
-  { name: "Ianis Crossley", score: 20 },
-  { name: "Johnnie Owens", score: 74 },
-  { name: "Emily-Rose Erickson", score: 33 },
-  { name: "Adeel Nieves", score: 100 },
-  { name: "Dustin Villegas", score: 98 },
-  { name: "Maxine Hughes", score: 65 },
-  { name: "Bilaal Harding", score: 79 },
-  { name: "Maddie Ventura", score: 71 },
-  { name: "Leroy Rees", score: 44 },
-  { name: "Wanda Frank", score: 73 },
-  { name: "Margaux Herbert", score: 80 },
-  { name: "Ali Rios", score: 70 },
-  { name: "Nigel Santiago", score: 25 },
-  { name: "Markus Greene", score: 78 },
-  { name: "Harlan Parrish", score: 97 },
-  { name: "Baran Davidson", score: 43 },
-  { name: "Seth Rodriguezh", score: 67 },
-  { name: "Diego Mayer", score: 100 },
-];
-class HashTable {
-  constructor(classSize) {
-    this.classSize = classSize;
-    this.classes = { A: [], B: [], C: [], D: [], Other: [] };
+class Queue {
+  constructor(limit = 10) {
+    this.limit = limit;
+
+    this.frontNode = null;
+    this.backNode = null;
+
+    this.size = 0;
+    this.waitingTime = 0;
   }
 
-  hash = (score) => {
-    if (score >= 90) return "A";
-    else if (score >= 80) return "B";
-    else if (score >= 70) return "C";
-    else if (score >= 60) return "D";
-    else return "Other";
+  isEmpty = () => this.size === 0;
+
+  isFull = () => this.size === this.limit;
+
+  peek = () => {
+    if (this.isEmpty()) console.log("Empty queue!");
+    else return this.frontNode;
   };
 
-  insert = (student) => {
-    let classRoom = this.hash(student.score);
-    if (this.classes[classRoom].length < this.classSize)
-      this.classes[classRoom].push(student);
-    else console.log("no mre room!");
+  enqueue = (groupSize) => {
+    if (this.isFull()) {
+      return "There's no place for you here ,this group can't entered now please wait,and the last group that added to this queue contain";
+    } else {
+      const newNode = new Node(groupSize);
+
+      if (this.isEmpty()) {
+        this.frontNode = newNode;
+        this.backNode = newNode;
+
+        this.waitingTime += groupSize * 0.5;
+      } else {
+        this.backNode.nextNode = newNode;
+
+        this.backNode = newNode;
+        this.waitingTime += groupSize * 0.5;
+      }
+      this.size++;
+    }
+  };
+
+  dequeue = () => {
+    if (this.isEmpty()) {
+      console.log("OOps! Nothing to remove.");
+    } else {
+      const removedNode = this.frontNode;
+      if (this.size === 1) {
+        this.frontNode = null;
+        this.backNode = null;
+        this.waitingTime = 0;
+      } else {
+        this.frontNode = removedNode.nextNode;
+        this.waitingTime -= removedNode.groupSize * 0.5;
+      }
+      this.size--;
+      return removedNode.groupSize;
+    }
   };
 }
-const size = prompt("how many students in each classroom? ");
-const table = new HashTable(size);
-students.forEach((s) => table.insert(s));
-console.log(table.classes);
+
+const ride = new Queue();
+console.log(`waiting Time when queue still empty : ${ride.waitingTime}`);
+queueGroups = [15, 12, 3, 7];
+let i = 0;
+while (i < queueGroups.length) {
+  if (!ride.isFull()) {
+    while (queueGroups[i] > 12) {
+      ride.enqueue(12);
+      queueGroups[i] -= 12;
+    }
+    ride.enqueue(queueGroups[i]);
+  } else {
+    console.log(`${ride.enqueue()} ${queueGroups[i - 1]} people`);
+    break;
+  }
+  i++;
+}
+
+console.log(
+  `waiting Time after adding four groups to the queue: ${ride.waitingTime}`
+);
+console.log(
+  `the group size for the group that removed from the queue : ${ride.dequeue()}`
+);
+console.log(
+  `waiting Time after remove one element from the queue: ${ride.waitingTime}`
+);
